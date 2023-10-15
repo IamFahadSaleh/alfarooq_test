@@ -1,0 +1,1 @@
+web: gunicorn alfarooq_test.wsgi --log-file -
