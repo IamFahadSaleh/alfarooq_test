@@ -1,0 +1,106 @@
+<div class="modal fade" id="updateMediaBuying{{campaign.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div id="add-modal-header" class="modal-header">
+          <h1 class="modal-title fs-5 modalfixedtitle" id="exampleModalLabel">تعديل حملة</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+
+          <form action="/update/{{campaign.id}}" method="POST" autocomplete="off">
+            {% csrf_token %}
+            <div class="modal-body">
+              <input type="hidden" id="update_campaign_id" value="{{campaign.id}}">
+
+              <div class="input-group mb-2">
+                <span style="width:45px;" class="input-group-text"><i class="fas fa-clock"></i></span>
+                <input type="date" class="form-control" id="date" name="date" placeholder="تاريخ الحملة" value="{{campaign.media_campaign_date|date:'Y-m-d'}}" required>
+              </div>
+  
+              <div class="input-group mb-2 mt-2">
+                <span style="width:45px;" class="input-group-text"><i class="fas fa-cart-shopping"></i></span>
+                <select class="form-select" name="product" required>
+                  <option value="" selected>اختر المنتج</option>
+                  {% for product in products %}
+                  <option value="{{product.product_name}}"{% if campaign.media_product == product.product_name %} selected{% endif %}>{{product.product_name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+  
+              <div class="input-group mb-2 mt-2">
+                <span style="width:45px;" class="input-group-text"><i class="fas fa-search"></i></span>
+                <select class="form-select" name="platform" required>
+                  <option value="" selected>اختر المنصة</option>
+                  {% for platform in platforms %}
+                  <option value="{{platform.platform_name}}"{% if campaign.media_platform == platform.platform_name %} selected{% endif %}>{{platform.platform_name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+  
+              <div class="input-group mb-2 mt-2">
+                <span style="width:45px;" class="input-group-text"><i class="fas fa-user"></i></span>
+                <select class="form-select" name="reference" required>
+                  <option value="" selected>اختر الجهة/الشخص</option>
+                  {% for reference in references %}
+                  <option value="{{reference.reference_name}}"{% if campaign.media_name == reference.reference_name %} selected{% endif %}>{{reference.reference_name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+  
+              <div class="input-group mb-2 mt-2">
+                <span style="width:45px;" class="input-group-text"><i class="fas fa-money-bill"></i></span>
+                <input type="number" step="any" class="form-control" name="amount" id="update_amount{{campaign.id}}"  placeholder="المبلغ بالريال" value="{{campaign.media_amount}}" required>
+              </div>
+  
+              <div class="input-group mb-2 mt-2">
+                <span style="width:45px;" class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                <input type="number" step="any" class="form-control" name="amount_dollar" id="update_amount_dollar{{campaign.id}}"  placeholder="المبلغ بالدولار" value="{{campaign.media_amount_dollar}}" required>
+              </div>
+  
+              <div class="d-grid gap-2">
+                <input type="submit" style="background-color: #FAAB36; border: none;" class="btn btn-primary mb-3 mt-3" value="تعديل" id="update_btn">
+              </div>
+            </div>
+          </form>
+  
+        
+  
+      </div>
+    </div>
+  </div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+
+  document.getElementById('updateMediaBuying{{campaign.id}}').addEventListener('show.bs.modal', event => {
+  
+  document.getElementById("update_amount{{campaign.id}}").addEventListener("keyup", update_convertToDollar);
+  document.getElementById("update_amount_dollar{{campaign.id}}").addEventListener("keyup", update_convertToRiyal);
+
+  function update_convertToDollar() {
+    let amount = document.getElementById("update_amount{{campaign.id}}").value;
+    document.getElementById("update_amount_dollar{{campaign.id}}").value = Math.round((amount/3.75 + Number.EPSILON) * 100) / 100
+    if (amount == '') {
+      document.getElementById("update_amount_dollar{{campaign.id}}").value = ''
+    }
+  }
+
+  function update_convertToRiyal() {
+    let amount_dollar = document.getElementById("update_amount_dollar{{campaign.id}}").value;
+    document.getElementById("update_amount{{campaign.id}}").value = Math.round((amount_dollar*3.75 + Number.EPSILON) * 100) / 100
+    if (amount == '') {
+      document.getElementById("update_amount{{campaign.id}}").value = ''
+    }
+  }
+
+
+})
+
+
+
+document.getElementById('updateMediaBuying{{campaign.id}}').addEventListener('hidden.bs.modal', event => {
+  $("form").trigger("reset");
+})
+
+</script>

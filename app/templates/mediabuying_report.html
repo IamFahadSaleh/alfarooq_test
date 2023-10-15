@@ -1,0 +1,826 @@
+{% extends 'base.html' %}
+
+{% block title %} تقرير الاعلانات الممولة{% endblock title %}
+
+{% block link-path %}<a class="navbar-brand" href="#">تقرير الاعلانات الممولة</a>{% endblock link-path %}
+
+{% block mainhead-title %}<a class="nav-link active" aria-current="page" href="#">تقرير الاعلانات الممولة</a>{% endblock mainhead-title %}
+
+{% block content %}
+
+<a href="{% url 'index' %}" class="btn btn-outline-success" style="font-weight: bold;"><i class="fas fa-home"></i>&nbsp;الصفحة الرئيسية</a>
+
+
+<div class="dividersss3">
+
+  <div class="row mt-2">
+    <div class="col-4">
+      <div class="border border-secondary-subtle p-2 rounded-3 shadow">
+
+        <form id="report_form" method="GET" autocomplete="off" onsubmit="setData(this)">
+          {% csrf_token %}
+          <div class="modal-body">
+
+      
+            <div class="input-group mb-2">
+              <span style="width:60px;" class="input-group-text">من</span>
+              <input type="date" class="form-control" id="date_from" name="date_from">
+            </div>
+
+            <div class="input-group mb-2">
+              <span style="width:60px;" class="input-group-text">إلى</span>
+              <input type="date" class="form-control" id="date_to" name="date_to">
+            </div>
+
+
+            <div class="input-group mb-2 mt-2">
+              <span style="width:60px;" class="input-group-text">المنصة</i></span>
+              <select class="form-select" id="report_platform" name="report_platform">
+                <option value="" selected>اختر المنصة</option>
+                {% for platform in platforms %}
+                <option value="{{platform}}">{{platform}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+
+            <div class="input-group mb-2 mt-2">
+              <span style="width:60px;" class="input-group-text">الجهة</i></span>
+              <select class="form-select" id="report_reference" name="report_reference">
+                <option value="" selected>اختر الجهة/الشخص</option>
+                {% for reference in references %}
+                <option value="{{reference}}">{{reference}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="input-group mb-2 mt-2">
+              <span style="width:60px;" class="input-group-text">المنتج</span>
+              <select class="form-select" id="report_product" name="report_product">
+                <option value="" selected>اختر المنتج</option>
+                {% for product in products %}
+                <option value="{{product}}">{{product}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+
+            <div class="d-grid gap-2">
+              <input type="submit" style="font-size: 18px;font-weight: bold;" class="btn btn-outline-success mt-2" value="عرض التقرير">
+              <input type="reset" style="font-size: 18px;font-weight: bold;" class="btn btn-outline-dark mb-2" value="مسح">
+            </div>
+          </div>
+        </form>
+
+
+      </div>
+    </div>
+
+    <div class="col-8">
+      <div class="row">
+        <div class="col-3 border border-success-subtle p-4 rounded-3 shadow-sm text-center">
+          <div id="reportmediaamount">{{total_amount|floatformat:'2g'}}</div>
+          <span class="reportmediatag">المبلغ المدفوع</span>
+        </div>
+        <div class="col-3 border border-warning-subtle p-4 rounded-3 shadow-sm text-center">
+          <div id="reportmediaamount">{{total_requests|floatformat:'0g'}}</div>
+          <span class="reportmediatag">الطلبات</span>
+        </div>
+        <div class="col-2 border border-success-subtle p-4 rounded-3 shadow-sm text-center">
+          <div style="font-size: 20px;color: navy;" id="reportmediaamount">{{total_cost_per_request}}</div>
+          <span class="reportmediatag">تكلفة الطلب الواحد</span>
+        </div>
+        <div class="col-2 border border-warning-subtle p-4 rounded-3 shadow-sm text-center">
+          <div style="font-size: 20px;color: navy;" id="reportmediaamount">{{total_impressions|floatformat:'0g'}}</div>
+          <span class="reportmediatag">المشاهدات</span>
+        </div>
+        <div class="col-2 border border-success-subtle p-4 rounded-3 shadow-sm text-center">
+          <div style="font-size: 20px;color: navy;" id="reportmediaamount">{{total_clicks|floatformat:'0g'}}</div>
+          <span class="reportmediatag">النقرات</span>
+        </div>
+      </div>
+
+
+      <div class="row mt-2 mb-3">
+
+        <div class="col-6 border border-secondary-subtle p-3 rounded-3">
+          <input type="submit" onclick="chooseRqst(this)" name="media_approx_requests" class="btn btn-info btn-sm"
+            value="الطلبات">
+          <input type="submit" onclick="chooseRqst(this)" name="media_total_impressions" class="btn btn-info btn-sm"
+            value="المشاهدات">
+          <input type="submit" onclick="chooseRqst(this)" name="media_total_clicks" class="btn btn-info btn-sm"
+            value="النقرات">
+          <canvas id="mypie1" height="250"></canvas>
+          <canvas id="mypie2" height="250" style="display: none;"></canvas>
+          <canvas id="mypie3" height="250" style="display: none;"></canvas>
+        </div>
+
+        <div class="col-6 border border-secondary-subtle p-3 rounded-3">
+          <canvas id="mychart1" height="300"></canvas>
+        </div>
+      </div>
+
+      <div class="row mt-2 mb-3">
+        <div class="col-12 border border-secondary-subtle p-3 rounded-3">
+          <canvas id="mychart2"></canvas>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+
+<div class="dividersss4">
+  <div class="row mt-2">
+    <div class="col-4">
+      <div class="border border-secondary-subtle p-2 rounded-3 shadow">
+
+        <form method="GET" autocomplete="off" onsubmit="setData(this)">
+          {% csrf_token %}
+          <div class="modal-body">
+
+            <div class="input-group mb-2">
+              <span style="width:60px;" class="input-group-text">من</span>
+              <input type="date" class="form-control" id="date_from2" name="date_from">
+            </div>
+
+            <div class="input-group mb-2">
+              <span style="width:60px;" class="input-group-text">إلى</span>
+              <input type="date" class="form-control" id="date_to2" name="date_to">
+            </div>
+
+
+            <div class="input-group mb-2 mt-2">
+              <span style="width:60px;" class="input-group-text">المنصة</i></span>
+              <select class="form-select" id="report_platform2" name="report_platform">
+                <option value="" selected>اختر المنصة</option>
+                {% for platform in platforms %}
+                <option value="{{platform}}">{{platform}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+
+            <div class="input-group mb-2 mt-2">
+              <span style="width:60px;" class="input-group-text">الجهة</i></span>
+              <select class="form-select" id="report_reference2" name="report_reference">
+                <option value="" selected>اختر الجهة/الشخص</option>
+                {% for reference in references %}
+                <option value="{{reference}}">{{reference}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="input-group mb-2 mt-2">
+              <span style="width:60px;" class="input-group-text">المنتج</span>
+              <select class="form-select" id="report_product2" name="report_product">
+                <option value="" selected>اختر المنتج</option>
+                {% for product in products %}
+                <option value="{{product}}">{{product}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+
+            <div class="d-grid gap-2">
+              <input type="submit" style="font-size: 18px;font-weight: bold;" class="btn btn-outline-success mt-2" value="عرض التقرير">
+              <input type="reset" style="font-size: 18px;font-weight: bold;" class="btn btn-outline-dark mb-2" value="مسح">
+            </div>
+          </div>
+        </form>
+
+
+      </div>
+    </div>
+
+    <div class="col-8">
+      <div class="row">
+        <div class="col-6 border border-success-subtle p-4 rounded-3 shadow-sm text-center">
+          <div id="reportmediaamount">{{total_amount|floatformat:'2g'}}</div>
+          <span class="reportmediatag">المبلغ المدفوع</span>
+        </div>
+        <div class="col-6 border border-warning-subtle p-4 rounded-3 shadow-sm text-center">
+          <div id="reportmediaamount">{{total_requests|floatformat:'0g'}}</div>
+          <span class="reportmediatag">الطلبات</span>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-4 border border-success-subtle p-4 rounded-3 shadow-sm text-center">
+          <div style="font-size: 20px;color: navy;" id="reportmediaamount">{{total_cost_per_request}}</div>
+          <span class="reportmediatag">تكلفة الطلب الواحد</span>
+        </div>
+        <div class="col-4 border border-warning-subtle p-4 rounded-3 shadow-sm text-center">
+          <div style="font-size: 20px;color: navy;" id="reportmediaamount">{{total_impressions|floatformat:'0g'}}</div>
+          <span class="reportmediatag">المشاهدات</span>
+        </div>
+        <div class="col-4 border border-success-subtle p-4 rounded-3 shadow-sm text-center">
+          <div style="font-size: 20px;color: navy;" id="reportmediaamount">{{total_clicks|floatformat:'0g'}}</div>
+          <span class="reportmediatag">النقرات</span>
+        </div>
+      </div>
+
+
+      <div class="row mt-2 mb-3">
+
+        <div class="col-6 border border-secondary-subtle p-3 rounded-3">
+          <input type="submit" onclick="chooseRqst(this)" name="media_approx_requests" class="btn btn-info btn-sm"
+            value="الطلبات">
+          <input type="submit" onclick="chooseRqst(this)" name="media_total_impressions" class="btn btn-info btn-sm"
+            value="المشاهدات">
+          <input type="submit" onclick="chooseRqst(this)" name="media_total_clicks" class="btn btn-info btn-sm"
+            value="النقرات">
+          <canvas id="mypie11" height="250"></canvas>
+          <canvas id="mypie22" height="250" style="display: none;"></canvas>
+          <canvas id="mypie33" height="250" style="display: none;"></canvas>
+        </div>
+
+        <div class="col-6 border border-secondary-subtle p-3 rounded-3">
+          <canvas id="mychart11" height="300"></canvas>
+        </div>
+      </div>
+
+      <div class="row mt-2 mb-3">
+        <div class="col-12 border border-secondary-subtle p-3 rounded-3">
+          <canvas id="mychart22"></canvas>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+
+<div class="dividersss5">
+
+ <div class="row mt-2">
+      <form method="GET" autocomplete="off" onsubmit="setData(this)">
+        {% csrf_token %}
+        <div class="modal-body">
+
+          <div class="input-group mb-2">
+            <span style="width:60px;" class="input-group-text">من</span>
+            <input type="date" class="form-control" id="date_from3" name="date_from">
+          </div>
+
+          <div class="input-group mb-2">
+            <span style="width:60px;" class="input-group-text">إلى</span>
+            <input type="date" class="form-control" id="date_to3" name="date_to">
+          </div>
+
+
+          <div class="input-group mb-2 mt-2">
+            <span style="width:60px;" class="input-group-text">المنصة</i></span>
+            <select class="form-select" id="report_platform3" name="report_platform">
+              <option value="" selected>اختر المنصة</option>
+              {% for platform in platforms %}
+              <option value="{{platform}}">{{platform}}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+
+          <div class="input-group mb-2 mt-2">
+            <span style="width:60px;" class="input-group-text">الجهة</i></span>
+            <select class="form-select" id="report_reference3" name="report_reference">
+              <option value="" selected>اختر الجهة/الشخص</option>
+              {% for reference in references %}
+              <option value="{{reference}}">{{reference}}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="input-group mb-2 mt-2">
+            <span style="width:60px;" class="input-group-text">المنتج</span>
+            <select class="form-select" id="report_product3" name="report_product">
+              <option value="" selected>اختر المنتج</option>
+              {% for product in products %}
+              <option value="{{product}}">{{product}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="d-grid gap-2">
+            <input type="submit" style="font-size: 18px;font-weight: bold;" class="btn btn-outline-success mt-2" value="عرض التقرير">
+            <input type="reset" style="font-size: 18px;font-weight: bold;" class="btn btn-outline-dark mb-2" value="مسح">
+          </div>
+        </div>
+      </form>
+  </div>
+
+  <div class="row mt-1">
+  
+      <div class="row">
+        <div class="col-6 border border-success-subtle p-4 rounded-3 shadow-sm text-center">
+          <div id="reportmediaamount">{{total_amount|floatformat:'2g'}}</div>
+          <span class="reportmediatag">المبلغ المدفوع</span>
+        </div>
+        <div class="col-6 border border-warning-subtle p-4 rounded-3 shadow-sm text-center">
+          <div id="reportmediaamount">{{total_requests|floatformat:'0g'}}</div>
+          <span class="reportmediatag">الطلبات</span>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-4 border border-success-subtle p-4 rounded-3 shadow-sm text-center">
+          <div style="font-size: 20px;color: navy;" id="reportmediaamount">{{total_cost_per_request}}</div>
+          <span class="reportmediatag">تكلفة الطلب الواحد</span>
+        </div>
+        <div class="col-4 border border-warning-subtle p-4 rounded-3 shadow-sm text-center">
+          <div style="font-size: 20px;color: navy;" id="reportmediaamount">{{total_impressions|floatformat:'0g'}}</div>
+          <span class="reportmediatag">المشاهدات</span>
+        </div>
+        <div class="col-4 border border-success-subtle p-4 rounded-3 shadow-sm text-center">
+          <div style="font-size: 20px;color: navy;" id="reportmediaamount">{{total_clicks|floatformat:'0g'}}</div>
+          <span class="reportmediatag">النقرات</span>
+        </div>
+      </div>
+  </div>
+
+  <div class="row mt-1">
+
+      <div class="col-12 border border-secondary-subtle p-3 rounded-3">
+        <input type="submit" onclick="chooseRqst(this)" name="media_approx_requests" class="btn btn-info btn-sm"
+          value="الطلبات">
+        <input type="submit" onclick="chooseRqst(this)" name="media_total_impressions" class="btn btn-info btn-sm"
+          value="المشاهدات">
+        <input type="submit" onclick="chooseRqst(this)" name="media_total_clicks" class="btn btn-info btn-sm"
+          value="النقرات">
+        <canvas id="mypie111" height="250"></canvas>
+        <canvas id="mypie222" height="250" style="display: none;"></canvas>
+        <canvas id="mypie333" height="250" style="display: none;"></canvas>
+      </div>
+  </div>
+
+  <div class="row mt-1">
+    <div class="col-12 border border-secondary-subtle p-3 rounded-3">
+      <canvas id="mychart111" height="300"></canvas>
+    </div>
+  </div>
+
+  <div class="row mt-1">
+    <div class="col-12 border border-secondary-subtle p-3 rounded-3">
+      <canvas id="mychart222"></canvas>
+    </div>
+  </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript">
+
+  function setData(obj){ 
+    data = {
+      'date_from': obj.date_from.value,
+      'date_to': obj.date_to.value,
+      'report_platform': obj.report_platform.value,
+      'report_reference': obj.report_reference.value,
+      'report_product': obj.report_product.value,
+
+    }
+    sessionStorage.setItem("report_seleted_data", JSON.stringify(data)); 
+  }
+
+
+  function getData() {
+    return JSON.parse(sessionStorage.getItem("report_seleted_data"));
+  }
+  document.getElementById('date_from').value = getData().date_from
+  document.getElementById('date_to').value = getData().date_to
+  document.getElementById('report_platform').value = getData().report_platform
+  document.getElementById('report_reference').value = getData().report_reference
+  document.getElementById('report_product').value = getData().report_product
+
+  document.getElementById('date_from2').value = getData().date_from
+  document.getElementById('date_to2').value = getData().date_to
+  document.getElementById('report_platform2').value = getData().report_platform
+  document.getElementById('report_reference2').value = getData().report_reference
+  document.getElementById('report_product2').value = getData().report_product
+
+  document.getElementById('date_from3').value = getData().date_from
+  document.getElementById('date_to3').value = getData().date_to
+  document.getElementById('report_platform3').value = getData().report_platform
+  document.getElementById('report_reference3').value = getData().report_reference
+  document.getElementById('report_product3').value = getData().report_product
+
+  
+
+
+  function chooseRqst(obj) {
+    let choice = obj.value
+    if (choice == 'الطلبات') {
+      mypie1.canvas.style.display = 'block'
+      mypie2.canvas.style.display = 'none'
+      mypie3.canvas.style.display = 'none'
+
+      mypie11.canvas.style.display = 'block'
+      mypie22.canvas.style.display = 'none'
+      mypie33.canvas.style.display = 'none'
+
+      mypie111.canvas.style.display = 'block'
+      mypie222.canvas.style.display = 'none'
+      mypie333.canvas.style.display = 'none'
+    }
+
+    if (choice == 'المشاهدات') {
+      mypie1.canvas.style.display = 'none'
+      mypie2.canvas.style.display = 'block'
+      mypie3.canvas.style.display = 'none'
+
+      mypie11.canvas.style.display = 'none'
+      mypie22.canvas.style.display = 'block'
+      mypie33.canvas.style.display = 'none'
+
+      mypie111.canvas.style.display = 'none'
+      mypie222.canvas.style.display = 'block'
+      mypie333.canvas.style.display = 'none'
+    }
+
+    if (choice == 'النقرات') {
+      mypie1.canvas.style.display = 'none'
+      mypie2.canvas.style.display = 'none'
+      mypie3.canvas.style.display = 'block'
+
+      mypie11.canvas.style.display = 'none'
+      mypie22.canvas.style.display = 'none'
+      mypie33.canvas.style.display = 'block'
+
+      mypie111.canvas.style.display = 'none'
+      mypie222.canvas.style.display = 'none'
+      mypie333.canvas.style.display = 'block'
+    }
+  }
+
+
+  
+  const mypie1 = new Chart(document.getElementById('mypie1'), {
+    type: 'doughnut',
+    data: {
+      labels: {{labels|safe}},
+  datasets: [{
+    data: {{data_request|safe}},
+    borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      // y: {
+      //   beginAtZero: true
+      // }
+    },
+    plugins: {
+      title: {
+        display: true,
+          text: 'مجموع الطلبات لكل منصة'
+      }
+    }
+
+  }
+});
+
+
+  const mypie2 = new Chart(document.getElementById('mypie2'), {
+    type: 'doughnut',
+    data: {
+      labels: {{labels|safe}},
+  datasets: [{
+    data: {{data_impression|safe}},
+    borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      // y: {
+      //   beginAtZero: true
+      // }
+    },
+    plugins: {
+      title: {
+        display: true,
+          text: 'مجموع المشاهدات لكل منصة'
+      }
+    }
+
+  }
+});
+
+  const mypie3 = new Chart(document.getElementById('mypie3'), {
+    type: 'doughnut',
+    data: {
+      labels: {{labels|safe}},
+  datasets: [{
+    data: {{data_click|safe}},
+    borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      // y: {
+      //   beginAtZero: true
+      // }
+    },
+    plugins: {
+      title: {
+        display: true,
+          text: 'مجموع النقرات لكل منصة',
+            }
+    }
+
+  }
+});
+
+
+  const mychart1 = new Chart(document.getElementById('mychart1'), {
+    type: 'line',
+    data: {
+      labels: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
+      datasets: [{
+        label: 'مجموع الطلبات خلال أيام الأسبوع',
+        data: {{data_weekday|safe}},
+        borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    },
+    // indexAxis: 'y',
+  }
+});
+
+  const mychart2 = new Chart(document.getElementById('mychart2'), {
+    type: 'bar',
+    data: {
+      labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+      datasets: [{
+        label: 'مجموع الطلبات في كل شهر',
+        data: {{data_month| safe}},
+        borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    },
+    // indexAxis: 'y',
+  }
+});
+
+
+
+
+
+const mypie11 = new Chart(document.getElementById('mypie11'), {
+    type: 'doughnut',
+    data: {
+      labels: {{labels|safe}},
+  datasets: [{
+    data: {{data_request|safe}},
+    borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      // y: {
+      //   beginAtZero: true
+      // }
+    },
+    plugins: {
+      title: {
+        display: true,
+          text: 'مجموع الطلبات لكل منصة'
+      }
+    }
+
+  }
+});
+
+
+  const mypie22 = new Chart(document.getElementById('mypie22'), {
+    type: 'doughnut',
+    data: {
+      labels: {{labels|safe}},
+  datasets: [{
+    data: {{data_impression|safe}},
+    borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      // y: {
+      //   beginAtZero: true
+      // }
+    },
+    plugins: {
+      title: {
+        display: true,
+          text: 'مجموع المشاهدات لكل منصة'
+      }
+    }
+
+  }
+});
+
+  const mypie33 = new Chart(document.getElementById('mypie33'), {
+    type: 'doughnut',
+    data: {
+      labels: {{labels|safe}},
+  datasets: [{
+    data: {{data_click|safe}},
+    borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      // y: {
+      //   beginAtZero: true
+      // }
+    },
+    plugins: {
+      title: {
+        display: true,
+          text: 'مجموع النقرات لكل منصة',
+            }
+    }
+
+  }
+});
+
+
+  const mychart11 = new Chart(document.getElementById('mychart11'), {
+    type: 'line',
+    data: {
+      labels: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
+      datasets: [{
+        label: 'مجموع الطلبات خلال أيام الأسبوع',
+        data: {{data_weekday|safe}},
+        borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    },
+    // indexAxis: 'y',
+  }
+});
+
+  const mychart22 = new Chart(document.getElementById('mychart22'), {
+    type: 'bar',
+    data: {
+      labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+      datasets: [{
+        label: 'مجموع الطلبات في كل شهر',
+        data: {{data_month| safe}},
+        borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    },
+    // indexAxis: 'y',
+  }
+});
+
+
+
+
+
+const mypie111 = new Chart(document.getElementById('mypie111'), {
+    type: 'doughnut',
+    data: {
+      labels: {{labels|safe}},
+  datasets: [{
+    data: {{data_request|safe}},
+    borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      // y: {
+      //   beginAtZero: true
+      // }
+    },
+    plugins: {
+      title: {
+        display: true,
+          text: 'مجموع الطلبات لكل منصة'
+      }
+    }
+
+  }
+});
+
+
+  const mypie222 = new Chart(document.getElementById('mypie222'), {
+    type: 'doughnut',
+    data: {
+      labels: {{labels|safe}},
+  datasets: [{
+    data: {{data_impression|safe}},
+    borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      // y: {
+      //   beginAtZero: true
+      // }
+    },
+    plugins: {
+      title: {
+        display: true,
+          text: 'مجموع المشاهدات لكل منصة'
+      }
+    }
+
+  }
+});
+
+  const mypie333 = new Chart(document.getElementById('mypie333'), {
+    type: 'doughnut',
+    data: {
+      labels: {{labels|safe}},
+  datasets: [{
+    data: {{data_click|safe}},
+    borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      // y: {
+      //   beginAtZero: true
+      // }
+    },
+    plugins: {
+      title: {
+        display: true,
+          text: 'مجموع النقرات لكل منصة',
+            }
+    }
+
+  }
+});
+
+
+  const mychart111 = new Chart(document.getElementById('mychart111'), {
+    type: 'line',
+    data: {
+      labels: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
+      datasets: [{
+        label: 'مجموع الطلبات خلال أيام الأسبوع',
+        data: {{data_weekday|safe}},
+        borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    },
+    // indexAxis: 'y',
+  }
+});
+
+  const mychart222 = new Chart(document.getElementById('mychart222'), {
+    type: 'bar',
+    data: {
+      labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+      datasets: [{
+        label: 'مجموع الطلبات في كل شهر',
+        data: {{data_month| safe}},
+        borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    },
+    // indexAxis: 'y',
+  }
+});
+
+
+
+ 
+
+
+
+</script>
+
+{% endblock content %}

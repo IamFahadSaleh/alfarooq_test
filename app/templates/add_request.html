@@ -1,0 +1,87 @@
+<div class="modal fade" id="addRequest{{campaign.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="add-modal-header" class="modal-header">
+                <h1 class="modal-title fs-5 modalfixedtitle" id="exampleModalLabel">إضافة طلب جديد</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+
+            <form action="/add_request" method="POST" autocomplete="off">
+                {% csrf_token %}
+                <div class="modal-body">
+
+                    <input type="hidden" id="request_campaign_id" name="media_request_id" value="{{campaign.id}}">
+
+                    <div class="input-group mb-2 mt-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-cart-shopping"></i></span>
+                        <input type="text" class="form-control" name="request_product" value="{{campaign.media_product}}" readonly>
+                    </div>
+
+                    <div class="input-group mb-2 mt-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-money-bill"></i></span>
+                        <input type="number" step="any" class="form-control" name="request_amount"
+                            id="request_amount{{campaign.id}}" value="{{campaign.media_amount}}" readonly>
+                    </div>
+
+                    <hr>
+
+                    <div class="input-group mb-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-clock"></i></span>
+                        <input type="date" class="form-control"  name="media_date_request" placeholder="تاريخ إدخال الطلب" required>
+                    </div>
+
+                    <div class="input-group mb-2 mt-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-shopping-basket"></i></span>
+                        <input type="number" class="form-control" placeholder="العدد التقريبي للطلبات" id="media_approx_requests{{campaign.id}}" name="media_approx_requests" required>
+                    </div>
+
+                    <div class="input-group mb-2 mt-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
+                        <input type="number" step="any" placeholder="تكلفة الطلب الواحد" class="form-control" id="media_cost_per_request{{campaign.id}}" name="media_cost_per_request" readonly>
+                    </div>
+
+                    <div class="input-group mb-2 mt-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-tv"></i></span>
+                        <input type="number" placeholder="عدد المشاهدات" class="form-control" name="media_total_impressions" required>
+                    </div>
+
+                    <div class="input-group mb-2 mt-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-mouse"></i></span>
+                        <input type="number" placeholder="عدد النقرات" class="form-control" name="media_total_clicks" required>
+                    </div>
+
+                
+
+                    <div class="d-grid gap-2">
+                        <input type="submit" class="btn btn-primary mb-3 mt-3" value="حفظ">
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+document.getElementById('addRequest{{campaign.id}}').addEventListener('show.bs.modal', event => {
+  
+    document.getElementById("media_approx_requests{{campaign.id}}").addEventListener("keyup", cost_per_request);
+
+    function cost_per_request() {
+        let total_cost = document.getElementById("request_amount{{campaign.id}}").value;
+        let total_requests = document.getElementById("media_approx_requests{{campaign.id}}").value;
+        document.getElementById("media_cost_per_request{{campaign.id}}").value = Math.round((total_requests / total_cost + Number.EPSILON) * 100) / 100
+        if (total_requests == '') {
+            document.getElementById("media_approx_requests{{campaign.id}}").value = ''
+        }
+    }
+
+})
+
+document.getElementById('addRequest{{campaign.id}}').addEventListener('hidden.bs.modal', event => {
+  $("form").trigger("reset");
+})
+    
+</script>

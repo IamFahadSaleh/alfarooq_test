@@ -1,0 +1,75 @@
+<div class="modal fade" id="updateRequest{{selected_request.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div id="add-modal-header" class="modal-header">
+          <h1 class="modal-title fs-5 modalfixedtitle" id="exampleModalLabel">تعديل الطلبات</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+
+          <form action="/update_request/{{selected_request.id}}" method="POST" autocomplete="off">
+            {% csrf_token %}
+            <div class="modal-body">
+                
+                <input type="hidden" id="update_request_amount" value="{{selected_campaign.media_amount}}">
+
+                <div class="input-group mb-2">
+                    <span style="width:45px;" class="input-group-text"><i class="fas fa-clock"></i></span>
+                    <input type="date" class="form-control"  name="media_date_request" placeholder="تاريخ إدخال الطلب" value="{{selected_request.media_date_request|date:'Y-m-d'}}" required>
+                </div>
+
+                <div class="input-group mb-2 mt-2">
+                    <span style="width:45px;" class="input-group-text"><i class="fas fa-shopping-basket"></i></span>
+                    <input type="number" class="form-control" placeholder="العدد التقريبي للطلبات" id="update_media_approx_requests{{selected_request.id}}" name="media_approx_requests" value="{{selected_request.media_approx_requests}}" required>
+                </div>
+
+                <div class="input-group mb-2 mt-2">
+                    <span style="width:45px;" class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
+                    <input type="number" step="any" placeholder="تكلفة الطلب الواحد" class="form-control" id="update_media_cost_per_request{{selected_request.id}}" name="media_cost_per_request"  value="{{selected_request.media_cost_per_request}}" readonly>
+                </div>
+
+                <div class="input-group mb-2 mt-2">
+                    <span style="width:45px;" class="input-group-text"><i class="fas fa-tv"></i></span>
+                    <input type="number" placeholder="عدد المشاهدات" class="form-control" name="media_total_impressions"  value="{{selected_request.media_total_impressions}}" required>
+                </div>
+
+                <div class="input-group mb-2 mt-2">
+                    <span style="width:45px;" class="input-group-text"><i class="fas fa-mouse"></i></i></span>
+                    <input type="number" placeholder="عدد النقرات" class="form-control" name="media_total_clicks"  value="{{selected_request.media_total_clicks}}" required>
+                </div>
+
+              <div class="d-grid gap-2">
+                <input type="submit" style="background-color: #FAAB36; border: none;" class="btn btn-primary mb-3 mt-3" value="تعديل" id="update_btn">
+              </div>
+            </div>
+          </form>
+  
+        
+  
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+document.getElementById('updateRequest{{selected_request.id}}').addEventListener('show.bs.modal', event => {
+    document.getElementById("update_media_approx_requests{{selected_request.id}}").addEventListener("keyup", update_cost_per_request);
+
+    function update_cost_per_request() {
+        let total_cost = document.getElementById("update_request_amount").value;
+        let total_requests = document.getElementById("update_media_approx_requests{{selected_request.id}}").value;
+        document.getElementById("update_media_cost_per_request{{selected_request.id}}").value = Math.round((total_requests/total_cost + Number.EPSILON) * 100) / 100
+        if (total_requests == '') {
+            document.getElementById("update_media_cost_per_request{{selected_request.id}}").value = ''
+        }
+    }
+
+})
+
+document.getElementById('updateRequest{{selected_request.id}}').addEventListener('hidden.bs.modal', event => {
+  $("form").trigger("reset");
+})
+    
+</script>
+
+

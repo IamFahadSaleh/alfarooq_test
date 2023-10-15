@@ -1,0 +1,59 @@
+<div class="modal fade" id="deleteRequest{{selected_request.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div id="add-modal-header" class="modal-header">
+          <h1 class="modal-title fs-5 modalfixedtitle" id="exampleModalLabel">حذف الطلبات</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+
+          <form action="/delete_request/{{selected_request.id}}" method="POST" autocomplete="off">
+            {% csrf_token %}
+            <div class="modal-body">
+              <p style="color: red; font-size: 16px; font-weight: bold;">هل ترغب في تأكيد حذف هذه الطلبات نهائياً؟</p>
+              <input type="hidden" id="delete_campaign_id" value="{{selected_request.id}}">
+
+              <div class="input-group mb-2">
+                  <span style="width:45px;" class="input-group-text"><i class="fas fa-clock"></i></span>
+                  <input type="text" class="form-control" name="date"
+                      value="{{selected_request.media_date_request|date:'Y-m-d'}}" readonly>
+              </div>
+
+              <div class="input-group mb-2 mt-2">
+                  <span style="width:45px;" class="input-group-text"><i class="fas fa-cart-shopping"></i></span>
+                  <input type="text" class="form-control" name="media_approx_requests" value="{{selected_request.media_approx_requests|floatformat:'0g'}}"
+                      readonly>
+              </div>
+
+              <div class="input-group mb-2 mt-2">
+                  <span style="width:45px;" class="input-group-text"><i class="fas fa-search"></i></span>
+                  <input type="text" class="form-control" name="media_cost_per_request" value="{{selected_request.media_cost_per_request}}"
+                      readonly>
+              </div>
+
+              <div class="input-group mb-2 mt-2">
+                  <span style="width:45px;" class="input-group-text"><i class="fas fa-user"></i></span>
+                  <input type="text" class="form-control" name="media_total_impressions" value="{{selected_request.media_total_impressions|floatformat:'0g'}}"
+                      readonly>
+              </div>
+
+              <div class="input-group mb-2 mt-2">
+                  <span style="width:45px;" class="input-group-text"><i class="fas fa-user"></i></span>
+                  <input type="text" class="form-control" name="media_total_clicks" value="{{selected_request.media_total_clicks|floatformat:'0g'}}"
+                      readonly>
+              </div>
+
+              <div class="d-grid gap-2">
+                  <input type="submit" class="btn btn-danger mb-3 mt-3" value="نعم">
+              </div>
+  
+            </div>
+          </form>
+  
+        
+  
+      </div>
+    </div>
+  </div>
+
+

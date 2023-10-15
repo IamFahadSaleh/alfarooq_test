@@ -1,0 +1,68 @@
+<div class="modal fade" id="addMediaBuying" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div id="add-modal-header" class="modal-header">
+        <h1 class="modal-title fs-5 modalfixedtitle" id="exampleModalLabel">إضافة حملة جديدة</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+
+        <form action="{% url 'add' %}" method="POST" autocomplete="off">
+          {% csrf_token %}
+          <div class="modal-body">
+            <div class="input-group mb-2">
+              <span style="width:45px;" class="input-group-text"><i class="fas fa-clock"></i></span>
+              <input type="date" class="form-control" id="date" name="date" placeholder="تاريخ الحملة" required>
+            </div>
+
+            <div class="input-group mb-2 mt-2">
+              <span style="width:45px;" class="input-group-text"><i class="fas fa-cart-shopping"></i></span>
+              <select class="form-select" id="product" name="product" required>
+                <option value="" selected>اختر المنتج</option>
+                {% for product in products %}
+                <option value="{{product.product_name}}">{{product.product_name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="input-group mb-2 mt-2">
+              <span style="width:45px;" class="input-group-text"><i class="fas fa-search"></i></span>
+              <select class="form-select" id="platform" name="platform" required>
+                <option value="" selected>اختر المنصة</option>
+                {% for platform in platforms %}
+                <option value="{{platform.platform_name}}">{{platform.platform_name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="input-group mb-2 mt-2">
+              <span style="width:45px;" class="input-group-text"><i class="fas fa-user"></i></span>
+              <select class="form-select" id="reference" name="reference" required>
+                <option value="" selected>اختر الجهة/الشخص</option>
+                {% for reference in references %}
+                <option value="{{reference.reference_name}}">{{reference.reference_name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="input-group mb-2 mt-2">
+              <span style="width:45px;" class="input-group-text"><i class="fas fa-money-bill"></i></span>
+              <input type="number" step="any" class="form-control" name="amount" id="add_amount"  placeholder="المبلغ بالريال" required>
+            </div>
+
+            <div class="input-group mb-2 mt-2">
+              <span style="width:45px;" class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+              <input type="number" step="any" class="form-control" name="amount_dollar" id="add_amount_dollar"  placeholder="المبلغ بالدولار" required>
+            </div>
+
+            <div class="d-grid gap-2">
+              <input type="submit" class="btn btn-primary mb-3 mt-3" value="حفظ">
+            </div>
+          </div>
+        </form>
+
+      
+
+    </div>
+  </div>
+</div>

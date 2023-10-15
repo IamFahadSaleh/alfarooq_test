@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block title %}الاعلانات الممولة{% endblock title %}
+
+
+{% block content %}
+
+{% for message in messages %}
+        {% if message.tags == 'success' %}
+            <div id="indexalert" class="alert alert-success  alert-sm alert-dismissible fade show" role="alert">
+                {{message}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endif %}
+{% endfor %}
+
+<button class="btn btn-outline-dark" style="font-weight: bold;" data-bs-toggle="modal" data-bs-target="#addMediaBuying"><i class="fas fa-plus"></i>&nbsp; حملة جديدة</button>
+<a class="btn btn-outline-success" style="font-weight: bold;" href="{% url 'mediabuying_report' %}"><i class="fas fa-chart-pie"></i>&nbsp; عرض التقرير</a>
+
+<div class="tbl-container">
+
+    <div class="d-flex justify-content-between mb-1 header">
+        <div class="search"> 
+            <input type="text" class="form-control" name="" id="search" placeholder="بحث">
+        </div>
+        <div class="d-flex align-items-center items-controller">
+            <h5 style="font-size: 15px; font-weight: bold;" class="align-self-center">الصفحة</h5>
+            <select name="" class="mx-2 form-select form-select-sm align-self-center" id="itemperpage">
+                <option value="04">04</option>
+                <option value="05">05</option>
+                <option value="08" selected>08</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+            </select>
+            <h5 style="font-size: 15px; font-weight: bold;" class="align-self-center">أسطر</h5>
+        </div>
+    </div>
+
+    <table class="tbl">
+        <thead>
+            <tr>
+                <th>تاريخ الحملة</th>
+                <th>المنصة</th>
+                <th>الجهة / الشخص</th>
+                <th>المنتج</th>
+                <th>المبلغ</th>
+                <th colspan="2">إجراء الحملة</th>
+                <th colspan="2">إجراء الطلبات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for campaign in campaigns %}
+            <tr>
+                <td data-label="تاريخ الحملة">{{campaign.media_campaign_date|date:'Y/m/d'}}</td>
+                <td data-label="المنصة">{{campaign.media_platform}}</td>
+                <td data-label="الجهة / الشخص">{{campaign.media_name}}</td>
+                <td data-label="المنتج">{{campaign.media_product}}</td>
+                <td data-label="المبلغ">{{campaign.media_amount|floatformat:'2g'}}</td>
+                <td data-label="إجراء الحملة"><a href="#" class="btn btn-warning btn-sm btnsize" data-bs-toggle="modal" data-bs-target="#updateMediaBuying{{campaign.id}}">تعديل</a></td>
+                <td data-label="إجراء الحملة"><a href="#" class="btn btn-danger btn-sm btnsize" data-bs-toggle="modal" data-bs-target="#deleteMediaBuying{{campaign.id}}">حذف</a></td>
+                <td data-label="إجراء الطلبات"><a href="#" class="btn btn-success btn-sm btnsize" data-bs-toggle="modal" data-bs-target="#addRequest{{campaign.id}}">طلب جديد</a></td>
+                <td data-label="إجراء الطلبات"><a href="{% url 'detail_request' campaign.id %}" class="btn btn-info btn-sm btnsize">عرض الطلبات</a></td>
+            </tr>
+            {% include 'add_request.html' %}
+            {% include 'update.html' %}
+            {% include 'delete.html' %}
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="bottom-field">
+        <ul class="pagination">
+            <li class="prev"><a href="#" id="prev">&#139;</a></li>
+            <!-- page number here -->
+            <li class="next"><a href="#" id="next">&#155;</a></li>
+        </ul>
+    </div>
+</div>
+
+
+
+
+{% include 'add.html' %}
+
+
+<script  type="text/javascript">
+var tbody = document.querySelector('tbody')
+var pageUl = document.querySelector('.pagination')
+var itemShow = document.querySelector('#itemperpage')
+var tr = tbody.querySelectorAll('tr')
+var emptyBox = []
+var index = 1
+var itemPerPage = 8
+
+for (let i = 0; i < tr.length; i++) {
+    emptyBox.push(tr[i])
+}
+
+itemShow.onchange = giveTrPerPage
+
+function giveTrPerPage() {
+    itemPerPage = Number(this.value)
+    displayPage(itemPerPage)
+    pageGenerator(itemPerPage)
+    getpageElement(itemPerPage)
+}
+
+function displayPage(limit) {
+    tbody.innerHTML = ''
+    for (let i = 0; i < limit; i++) {
+        if(emptyBox[i]) {
+            tbody.appendChild(emptyBox[i])
+        }
+    }
+    const pageNum = pageUl.querySelectorAll('.list')
+    pageNum.forEach(n => n.remove())
+}
+displayPage(itemPerPage)
+
+function pageGenerator(getem) {
+    const num_of_tr = emptyBox.length;
+    if (num_of_tr <= getem) {
+        pageUl.style.display = 'none';
+    } else {
+        pageUl.style.display = 'flex';
+        const num_Of_Page = Math.ceil(num_of_tr / getem);
+        for (i = 1; i <= num_Of_Page; i++) {
+            const li = document.createElement('li'); li.className = 'list';
+            const a = document.createElement('a'); a.href = '#'; a.innerText = i;
+            a.setAttribute('data-page', i);
+            li.appendChild(a);
+            pageUl.insertBefore(li, pageUl.querySelector('.next'));
+        }
+    }
+}
+pageGenerator(itemPerPage);
+
+let pageLink = pageUl.querySelectorAll('a')
+let lastPage = pageLink.length - 2
+
+function pageRunner(page, items, lastPage, active) {
+    for (button of page) {
+        button.onclick = (e) => {
+            const page_num = e.target.getAttribute('data-page')
+            const page_mover = e.target.getAttribute('id')
+
+            if (page_num != null) {
+                index = page_num
+            } else {
+                if (page_mover === 'next') {
+                    index++
+                    if (index >= lastPage) {
+                        index = lastPage
+                    }
+                } else {
+                    index--
+                    if (index <= 1) {
+                        index = 1
+                    }
+                }
+            }
+            pageMaker(index, items, active)
+        }
+    }
+}
+
+
+var pageLi = pageUl.querySelectorAll('.list')
+if(pageLi[0]) {
+    pageLi[0].classList.add('active')
+    pageRunner(pageLink, itemPerPage, lastPage, pageLi)
+}
+
+
+
+function getpageElement(val) {
+    let pagelink = pageUl.querySelectorAll('a')
+    let lastpage  = pagelink.length -2
+    let pageli = pageUl.querySelectorAll('.list')
+    if(pageli[0]) {
+        pageli[0].classList.add('active')
+    }
+    pageRunner(pagelink, val, lastpage, pageli)
+}
+
+
+function pageMaker(index, item_per_page, activePage) {
+    const start = item_per_page * index
+    const end = start + item_per_page
+    const current_page = emptyBox.slice((start - item_per_page), (end - item_per_page))
+    tbody.innerHTML = ''
+    for(let j = 0; j < current_page.length; j++) {
+        let item = current_page[j]
+        tbody.appendChild(item)
+    }
+    Array.from(activePage).forEach((e) => {
+        e.classList.remove('active')
+    })
+    activePage[index-1].classList.add('active')
+}
+
+
+
+
+var search = document.getElementById("search");
+search.onkeyup = e=>{
+    const filter = e.target.value.toUpperCase();
+    for (i = 0; i < tr.length; i++) {
+    const tableData = tr[i].querySelectorAll("td");
+    let allTextContent = '';
+    for (let ind = 0; ind < tableData.length; ind++) {
+        allTextContent += tableData[ind].innerText;
+    }
+    
+    if (allTextContent) {
+      if (allTextContent.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }       
+  }
+}
+
+
+
+
+$(document).ready(function() {
+    // messages timeout for 10 sec
+    setTimeout(function() {
+        $('#indexalert').fadeOut('slow');
+    }, 4000); // <-- time in milliseconds, 1000 =  1 sec
+});
+
+
+
+
+</script>
+
+{% endblock content %}

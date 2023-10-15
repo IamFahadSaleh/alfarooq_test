@@ -1,0 +1,10 @@
+{% load static %}
+
+<div class="text-center">
+    <img src="{% static 'images/norequest.png' %}" width="100"/>
+
+    <h3>عذراً...<br>
+        لا يوجد طلبات لهذه الحملة حتى الآن
+    </h3>
+    <a href="{% url 'index' %}" class="btn btn-outline-success" style="font-weight: bold;"><i class="fas fa-home"></i>&nbsp; الصفحة الرئيسية</a>
+</div>

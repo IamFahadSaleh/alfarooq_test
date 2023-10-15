@@ -1,0 +1,61 @@
+<div class="modal fade" id="deleteMediaBuying{{campaign.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="add-modal-header" class="modal-header">
+                <h1 class="modal-title fs-5 modalfixedtitle" id="exampleModalLabel">حذف حملة</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/delete/{{campaign.id}}" method="POST" autocomplete="off">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p style="color: red; font-size: 16px; font-weight: bold;">هل ترغب في تأكيد حذف هذه الحملة نهائياً؟</p>
+                    <input type="hidden" id="update_campaign_id" value="{{campaign.id}}">
+
+                    <div class="input-group mb-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-clock"></i></span>
+                        <input type="text" class="form-control" name="date"
+                            value="{{campaign.media_campaign_date|date:'Y-m-d'}}" readonly>
+                    </div>
+
+                    <div class="input-group mb-2 mt-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-cart-shopping"></i></span>
+                        <input type="text" class="form-control" name="product" value="{{campaign.media_product}}"
+                            readonly>
+                    </div>
+
+                    <div class="input-group mb-2 mt-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" name="platform" value="{{campaign.media_platform}}"
+                            readonly>
+                    </div>
+
+                    <div class="input-group mb-2 mt-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" name="reference" value="{{campaign.media_name}}"
+                            readonly>
+                    </div>
+
+                    <div class="input-group mb-2 mt-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-money-bill"></i></span>
+                        <input type="number" step="any" class="form-control" name="amount"
+                            id="update_amount{{campaign.id}}" value="{{campaign.media_amount}}" readonly>
+                    </div>
+
+                    <div class="input-group mb-2 mt-2">
+                        <span style="width:45px;" class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                        <input type="number" step="any" class="form-control" name="amount_dollar"
+                            id="update_amount_dollar{{campaign.id}}" value="{{campaign.media_amount_dollar}}" readonly>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <input type="submit" class="btn btn-danger mb-3 mt-3" value="نعم">
+                    </div>
+                </div>
+            </form>
+
+
+
+        </div>
+    </div>
+</div>
