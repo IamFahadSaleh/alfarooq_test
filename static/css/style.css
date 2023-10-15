@@ -1,1 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+html, body {
+    font-family: 'Amiri', serif;
+}
+
+.modal-header {
+   display: flex;
+   align-items: center;
+   justify-content: space-around;
+}
+.modalfixedtitle {
+    flex-grow: 1;
+}
+
+.tbl-container {
+    margin: 10px auto 0;
+}
+
+.tbl {
+    /* border: 1px solid white; */
+    width: 100%;
+    border-collapse:collapse;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.tbl thead {
+    background-color: #009879;
+}
+
+.tbl thead tr th {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 0.35px;
+    color: #FFFFFF;
+    opacity: 1;
+    padding: 12px;
+    vertical-align: middle;
+    border: 1px solid #61b390;
+}
+
+.tbl tbody tr td {
+    font-size: 14px;
+    /* letter-spacing: 0.35px; */
+    font-weight: normal;
+    /* color: #F1F1F1; */
+    padding: 4px;
+    text-align: center;
+    border: 1px solid #61b390;
+    
+}
+
+.tbl tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.tbl tbody tr:last-of-type {
+    border-bottom: 3px solid #009879;
+}
+
+
+
+.dividersss2 {
+    display: none;
+}
+
+.dividersss4 {
+    display: none;
+}
+
+
+.dividersss5 {
+    display: none;
+}
+
+
+
+/* mediabuying report */
+#reportmediaamount {
+    font-size: 25px;
+    font-weight: bolder;
+    color: green;
+}
+
+.reportmediatag {
+    font-weight: bold;
+    color: red;
+}
+
+
+
+.bottom-field {
+    width: 100%;
+    /* padding: 5px; */
+    padding-right: 1px;
+    margin-top: 5px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+}
+
+.pagination li {
+    list-style: none;
+    padding: 2px;
+    margin: 5px;
+    flex-shrink: 0;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid #999;
+    color: #999;
+}
+
+.pagination li.active {
+    background: #61b390;
+    color: white;
+    border-color: #61b390;
+}
+
+.pagination li a {
+    text-decoration: none;
+    color: inherit;
+    padding: 3px 8px;
+    display:block;
+    font-family: sans-serif;
+    font-size: 13px;
+}
+
+
+
+
+@media screen and (max-width: 1199px) {
+
+    .dividersss2 {
+        display: block;
+    }
+
+    .dividersss1 {
+        display: none;
+    }
+}
+
+
+@media screen and (max-width: 995px) {
+
+    .dividersss4 {
+        display: block;
+    }
+
+    .dividersss3 {
+        display: none;
+    }
+}
+
+
+
+
+@media screen and (max-width: 768px) {
+    
+    .tbl thead {
+        display: none;
+    }
+
+    .tbl tbody tr {
+        border: 1px solid #61b390;
+    }
+
+    .tbl, .tbl tbody, .tbl tr, .tbl td {
+        display: block;
+        width: 100%;
+        
+    }
+
+    .tbl tr{
+        margin-bottom: 15px;
+    }
+
+    .tbl tbody tr td {
+        text-align: left;
+        padding-right: 50%;
+        position: relative;
+        border: none;
+    }
+
+    .tbl td::before {
+        content: attr(data-label);
+        position: absolute;
+        right: 0;
+        width: 50%;
+        padding-right: 15px;
+        font-weight: 600;
+        font-size: 14px;
+        text-align: right;
+    }
+
+    .tbl tbody tr td .btnsize {
+        width: 100px;
+    }
+
+
+    .dividersss5 {
+        display: block;
+    }
+
+    .dividersss4 {
+        display: none;
+    }
+
+    .dividersss3 {
+        display: none;
+    }
+
+
+
+}
+
+
+
+
+/* detail-request page */
+
 
